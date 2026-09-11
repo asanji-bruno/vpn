@@ -58,7 +58,7 @@ class SshWsClient(private val config: TunnelConfig) {
                             while (isRunning) {
                                 val read = input.read(buf)
                                 if (read == -1) break
-                                webSocket?.send(ByteString.of(buf, 0, read))
+                                webSocket?.send(buf.toByteString(0, read))
                             }
                         } catch (e: Exception) {}
                         socket.close()
