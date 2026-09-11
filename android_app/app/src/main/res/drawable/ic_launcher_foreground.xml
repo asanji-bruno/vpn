@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Dark background circle -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M0,0 L108,0 L108,108 L0,108 Z"/>
+
+    <!-- Cyan "B" letter for BDNET -->
+    <path
+        android:fillColor="#06B6D4"
+        android:pathData="M30,25 L30,83 L58,83 C70,83 78,76 78,65 C78,57 73,52 66,50 C72,48 76,43 76,36 C76,29 70,25 58,25 Z
+                          M42,35 L56,35 C61,35 64,38 64,43 C64,48 61,51 56,51 L42,51 Z
+                          M42,61 L58,61 C63,61 66,64 66,69 C66,74 63,77 58,77 L42,77 Z"/>
+
+    <!-- Small cyan dot accent -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M80,22 A6,6 0 1,1 80,21.99 Z"/>
+</vector>
