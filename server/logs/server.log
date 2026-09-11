@@ -1,0 +1,70 @@
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.501] [INFO ] [server      ] BDNET Server starting...
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.511] [INFO ] [server      ] Flask API listening on 0.0.0.0:5001
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.512] [INFO ] [manager     ] Autostarting: dns_tunnel
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.521] [INFO ] [manager     ] Started dns_tunnel (pid=8736)
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.521] [INFO ] [manager     ] Autostarting: ws_relay
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.530] [INFO ] [manager     ] Started ws_relay (pid=7484)
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.530] [INFO ] [manager     ] Autostarting: ssh_ws_bridge
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.542] [INFO ] [manager     ] Started ssh_ws_bridge (pid=3744)
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.542] [INFO ] [manager     ] Autostarting: vless_server
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.554] [INFO ] [manager     ] Started vless_server (pid=11804)
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.554] [INFO ] [manager     ] Autostarting: http_connect
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.567] [INFO ] [manager     ] Started http_connect (pid=12676)
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.666] [INFO ] [http_connect] [14:35:32] [INFO ] [http_connect ] HTTP CONNECT Proxy listening on 0.0.0.0:3128
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.666] [INFO ] [http_connect] [14:35:32] [INFO ] [http_connect ] Allowed ports: [80, 443, 22, 8080, 8443]
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.678] [INFO ] [dns_tunnel  ] [14:35:32] [INFO ] [dns_tunnel   ] DNS Tunnel Server listening on UDP 0.0.0.0:53
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.680] [INFO ] [dns_tunnel  ] [14:35:32] [INFO ] [dns_tunnel   ] Tunnel domain: t.yourdomain.com
+[2026-09-11 14:35:32] [INFO ] [werkzeug    ] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.250.54.36:5001
+[2026-09-11 14:35:32] [INFO ] [werkzeug    ] [33mPress CTRL+C to quit[0m
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.795] [INFO ] [ws_relay    ] [14:35:32] [DEBUG] [ws_relay     ] Using proactor: IocpProactor
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.796] [INFO ] [vless_server] [14:35:32] [DEBUG] [vless_server ] Using proactor: IocpProactor
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.800] [INFO ] [ssh_ws_bridg] [14:35:32] [DEBUG] [ssh_ws_bridge] Using proactor: IocpProactor
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.807] [INFO ] [ws_relay    ] [14:35:32] [INFO ] [ws_relay     ] WS Relay listening on ws://0.0.0.0:8001
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.807] [INFO ] [vless_server] [14:35:32] [INFO ] [vless_server ] VLESS Server listening on ws://0.0.0.0:10000
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.807] [INFO ] [ssh_ws_bridg] [14:35:32] [INFO ] [ssh_ws_bridge] SSH-WS Bridge listening on ws://0.0.0.0:8002
+[2026-09-11 14:35:32] [INFO ] [server      ] [14:35:32.808] [INFO ] [ssh_ws_bridg] [14:35:32] [INFO ] [ssh_ws_bridge]   Forwarding to: 127.0.0.1:22
+[2026-09-11 14:35:33] [INFO ] [server      ] [14:35:33.265] [INFO ] [ws_relay    ] [14:35:33] [INFO ] [ws_relay     ] server listening on 0.0.0.0:8001
+[2026-09-11 14:35:33] [INFO ] [server      ] [14:35:33.265] [INFO ] [vless_server] [14:35:33] [INFO ] [vless_server ] server listening on 0.0.0.0:10000
+[2026-09-11 14:35:33] [INFO ] [server      ] [14:35:33.265] [INFO ] [ssh_ws_bridg] [14:35:33] [INFO ] [ssh_ws_bridge] server listening on 0.0.0.0:8002
+[2026-09-11 14:35:34] [INFO ] [werkzeug    ] 127.0.0.1 - - [11/Sep/2026 14:35:34] "GET /health HTTP/1.1" 200 -
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.512] [INFO ] [server      ] BDNET Server starting...
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.513] [INFO ] [server      ] Public URL (ngrok): https://battery-twirl-designate.ngrok-free.dev
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.513] [INFO ] [server      ] WS  relay endpoint: wss://battery-twirl-designate.ngrok-free.dev/ws
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.514] [INFO ] [server      ] VLESS  endpoint   : wss://battery-twirl-designate.ngrok-free.dev/vless
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.514] [INFO ] [server      ] SSH-WS endpoint   : wss://battery-twirl-designate.ngrok-free.dev/ssh-relay
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.514] [INFO ] [server      ] Info endpoint     : https://battery-twirl-designate.ngrok-free.dev/ngrok
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.515] [INFO ] [server      ] Flask API listening on 0.0.0.0:5001
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.516] [INFO ] [manager     ] Autostarting: dns_tunnel
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.526] [INFO ] [manager     ] Started dns_tunnel (pid=6880)
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.526] [INFO ] [manager     ] Autostarting: ws_relay
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.536] [INFO ] [manager     ] Started ws_relay (pid=10004)
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.537] [INFO ] [manager     ] Autostarting: ssh_ws_bridge
+[2026-09-11 14:38:55] [INFO ] [werkzeug    ] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.250.54.36:5001
+[2026-09-11 14:38:55] [INFO ] [werkzeug    ] [33mPress CTRL+C to quit[0m
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.550] [INFO ] [manager     ] Started ssh_ws_bridge (pid=1708)
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.550] [INFO ] [manager     ] Autostarting: vless_server
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.562] [INFO ] [manager     ] Started vless_server (pid=1336)
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.565] [INFO ] [manager     ] Autostarting: http_connect
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.581] [INFO ] [manager     ] Started http_connect (pid=8400)
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.667] [INFO ] [dns_tunnel  ] [14:38:55] [INFO ] [dns_tunnel   ] DNS Tunnel Server listening on UDP 0.0.0.0:53
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.669] [INFO ] [dns_tunnel  ] [14:38:55] [INFO ] [dns_tunnel   ] Tunnel domain: t.yourdomain.com
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.717] [INFO ] [http_connect] [14:38:55] [INFO ] [http_connect ] HTTP CONNECT Proxy listening on 0.0.0.0:3128
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.719] [INFO ] [http_connect] [14:38:55] [INFO ] [http_connect ] Allowed ports: [80, 443, 22, 8080, 8443]
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.741] [INFO ] [ws_relay    ] [14:38:55] [DEBUG] [ws_relay     ] Using proactor: IocpProactor
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.742] [INFO ] [ws_relay    ] [14:38:55] [INFO ] [ws_relay     ] WS Relay listening on ws://0.0.0.0:8001
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.764] [INFO ] [ssh_ws_bridg] [14:38:55] [DEBUG] [ssh_ws_bridge] Using proactor: IocpProactor
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.766] [INFO ] [ssh_ws_bridg] [14:38:55] [INFO ] [ssh_ws_bridge] SSH-WS Bridge listening on ws://0.0.0.0:8002
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.766] [INFO ] [ssh_ws_bridg] [14:38:55] [INFO ] [ssh_ws_bridge]   Forwarding to: 127.0.0.1:22
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.788] [INFO ] [ws_relay    ] [14:38:55] [INFO ] [ws_relay     ] server listening on 0.0.0.0:8001
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.799] [INFO ] [vless_server] [14:38:55] [DEBUG] [vless_server ] Using proactor: IocpProactor
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.800] [INFO ] [vless_server] [14:38:55] [INFO ] [vless_server ] VLESS Server listening on ws://0.0.0.0:10000
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.813] [INFO ] [ssh_ws_bridg] [14:38:55] [INFO ] [ssh_ws_bridge] server listening on 0.0.0.0:8002
+[2026-09-11 14:38:55] [INFO ] [server      ] [14:38:55.835] [INFO ] [vless_server] [14:38:55] [INFO ] [vless_server ] server listening on 0.0.0.0:10000
+[2026-09-11 14:38:58] [INFO ] [werkzeug    ] 127.0.0.1 - - [11/Sep/2026 14:38:58] "GET /health HTTP/1.1" 200 -
+[2026-09-11 14:38:59] [INFO ] [werkzeug    ] 127.0.0.1 - - [11/Sep/2026 14:38:59] "GET /ngrok HTTP/1.1" 200 -
