@@ -4,6 +4,7 @@ import com.bdnet.tunnel.model.TunnelConfig
 import com.bdnet.tunnel.util.Logger
 import okhttp3.*
 import okio.ByteString
+import okio.toByteString
 import java.net.ServerSocket
 import java.net.Socket
 import java.util.UUID
