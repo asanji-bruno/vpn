@@ -22,12 +22,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Install Gradle 8.7
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip -O /tmp/gradle.zip
+          unzip -q /tmp/gradle.zip -d /opt/gradle-dist
+          echo "/opt/gradle-dist/gradle-8.7/bin" >> $GITHUB_PATH
+
       - name: Build Android Debug APK
         run: |
-          if [ -d "android_app" ]; then cd android_app; fi
-          echo "android.useAndroidX=true" > gradle.properties
-          echo "android.enableJetifier=true" >> gradle.properties
-          echo "org.gradle.jvmargs=-Xmx2048m" >> gradle.properties
+          cd android_app
           gradle assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK Artifact
