@@ -1,0 +1,71 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "api_port": 5001,
+    "domain": "yourdomain.com",
+    "tunnel_subdomain": "t.yourdomain.com",
+    "tls_cert": "/etc/letsencrypt/live/yourdomain.com/fullchain.pem",
+    "tls_key": "/etc/letsencrypt/live/yourdomain.com/privkey.pem",
+    "ngrok_url": "https://battery-twirl-designate.ngrok-free.dev",
+    "public_url": "https://battery-twirl-designate.ngrok-free.dev"
+  },
+  "auth": {
+    "master_token": "CHANGE_THIS_NOW",
+    "allowed_uuids": [
+      "00000000-0000-0000-0000-000000000001"
+    ],
+    "require_auth": true
+  },
+  "methods": {
+    "dns_tunnel": {
+      "enabled": true,
+      "port": 53,
+      "tunnel_domain": "t.yourdomain.com",
+      "encode": "base32",
+      "record_types": ["TXT"],
+      "max_clients": 10,
+      "session_timeout": 120
+    },
+    "ws_relay": {
+      "enabled": true,
+      "internal_port": 8001,
+      "path": "/ws",
+      "max_connections": 50,
+      "ping_interval": 20
+    },
+    "ssh_ws_bridge": {
+      "enabled": true,
+      "internal_port": 8002,
+      "path": "/ssh-relay",
+      "target_host": "127.0.0.1",
+      "target_port": 22
+    },
+    "vless_server": {
+      "enabled": true,
+      "internal_port": 10000,
+      "path": "/vless",
+      "network": "ws"
+    },
+    "http_connect": {
+      "enabled": true,
+      "port": 3128,
+      "allowed_ports": [80, 443, 22, 8080, 8443]
+    }
+  },
+  "nat": {
+    "enabled": false,
+    "interface": "eth0"
+  },
+  "logging": {
+    "level": "DEBUG",
+    "log_dir": "./logs/",
+    "rotate_mb": 10,
+    "keep_files": 5
+  },
+  "rate_limit": {
+    "enabled": true,
+    "max_dns_qps": 50,
+    "max_ws_per_ip": 5,
+    "ban_duration_seconds": 300
+  }
+}

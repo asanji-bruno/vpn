@@ -1,0 +1,57 @@
+{
+  "server": {
+    "url": "https://battery-twirl-designate.ngrok-free.dev",
+    "ngrok_url": "https://battery-twirl-designate.ngrok-free.dev",
+    "ws_url": "wss://battery-twirl-designate.ngrok-free.dev/ws",
+    "vless_url": "wss://battery-twirl-designate.ngrok-free.dev/vless",
+    "ssh_relay_url": "wss://battery-twirl-designate.ngrok-free.dev/ssh-relay",
+    "domain": "t.yourdomain.com",
+    "ns_domain": "ns1.yourdomain.com"
+  },
+  "auth": {
+    "uuid": "00000000-0000-0000-0000-000000000001",
+    "token": "CHANGE_THIS_NOW"
+  },
+  "method": {
+    "active": "ws_tls"
+  },
+  "dns": {
+    "upstream_dns": "8.8.8.8",
+    "upstream_port": 53,
+    "tunnel_domain": "t.yourdomain.com",
+    "chunk_size": 180,
+    "poll_interval_ms": 200
+  },
+  "websocket": {
+    "path": "/ws",
+    "ping_interval": 20
+  },
+  "ssh": {
+    "user": "root",
+    "password": "",
+    "key_path": "",
+    "target_port": 22,
+    "local_socks_port": 1080
+  },
+  "sni": {
+    "bug_host": "mtn.cm",
+    "real_server_ip": ""
+  },
+  "vless": {
+    "path": "/vless",
+    "uuid": "00000000-0000-0000-0000-000000000001"
+  },
+  "http_connect": {
+    "proxy_host": "battery-twirl-designate.ngrok-free.dev",
+    "proxy_port": 80
+  },
+  "local_proxy": {
+    "socks5_port": 1080,
+    "http_port": 8080
+  },
+  "logging": {
+    "level": "DEBUG",
+    "show_hex": false,
+    "timestamps": true
+  }
+}
