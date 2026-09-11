@@ -24,7 +24,7 @@ class VlessClient(private val config: TunnelConfig) {
 
         val builder = OkHttpClient.Builder()
             .readTimeout(0, TimeUnit.MILLISECONDS)
-            .connectTimeout(10, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
 
         if (vpnService != null) {
             builder.socketFactory(object : SocketFactory() {

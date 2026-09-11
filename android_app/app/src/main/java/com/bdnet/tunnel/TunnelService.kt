@@ -17,21 +17,13 @@ import androidx.core.app.NotificationCompat
 import com.bdnet.tunnel.model.TunnelConfig
 import com.bdnet.tunnel.tunnel.*
 import com.bdnet.tunnel.util.Logger
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.net.InetAddress
-import java.net.Socket
-import java.util.concurrent.TimeUnit
-import javax.net.SocketFactory
+import java.net.HttpURLConnection
+import java.net.URL
 
 class TunnelService : VpnService() {
     private val binder = LocalBinder()
     private var vpnInterface: ParcelFileDescriptor? = null
     private var isVpnRunning = false
-    private var tunThread: Thread? = null
 
     private var wsClient: WsTunnelClient? = null
     private var vlessClient: VlessClient? = null
@@ -70,7 +62,7 @@ class TunnelService : VpnService() {
             intent.getStringExtra("vlessUrl")?.let { config.vlessUrl = it }
             intent.getStringExtra("sshWsUrl")?.let { config.sshWsUrl = it }
 
-            startForeground(NOTIFICATION_ID, createNotification("Connecting BDNET Tunnel..."))
+            startForeground(NOTIFICATION_ID, createNotification("Connecting..."))
             startTunnel(config)
         } else if (action == ACTION_STOP) {
             stopTunnel()
@@ -84,33 +76,49 @@ class TunnelService : VpnService() {
         stopTunnel()
         instance = this
         Logger.resetStats()
-        Logger.log("VERIFY", "Verifying connection to server: ${config.serverUrl}")
-        Logger.setConnectionState(false, "VERIFYING SERVER...")
 
-        // Background thread to verify server reachability before connecting
+        val isDns = config.selectedMethod.contains("Method 1") || config.selectedMethod.contains("DNS")
+
         Thread {
-            val verified = verifyServerConnection(config)
-            if (!verified && !config.selectedMethod.contains("DNS")) {
-                Logger.log("VERIFY", "ERROR: Server verification failed! Server unreachable at ${config.serverUrl}")
-                Logger.setConnectionState(false, "VERIFICATION FAILED")
-                return@Thread
-            }
-
-            if (verified) {
-                Logger.log("VERIFY", "Server Handshake SUCCESS! Server is online and responsive.")
+            // ── Step 1: Verify server BEFORE creating TUN interface ──────────
+            // We use a normal (non-VPN-protected) connection here because the
+            // TUN interface does not exist yet — socket protection not needed.
+            if (!isDns) {
+                Logger.log("VERIFY", "Pinging server: ${config.serverUrl}/health")
+                Logger.setConnectionState(false, "VERIFYING SERVER...")
+                val ok = pingServerHttp(config.serverUrl)
+                if (!ok) {
+                    Logger.log("VERIFY", "Server unreachable at ${config.serverUrl}")
+                    Logger.log("VERIFY", "Check: Is the server URL correct? Is it woken up?")
+                    Logger.setConnectionState(false, "VERIFICATION FAILED")
+                    return@Thread
+                }
+                Logger.log("VERIFY", "Server responded OK — proceeding to establish VPN interface.")
             } else {
-                Logger.log("VERIFY", "DNS Tunnel selected — proceeding with direct UDP queries.")
+                Logger.log("VERIFY", "DNS Tunnel selected — skipping HTTP verification, using UDP 53 directly.")
             }
 
-            Logger.log("SERVICE", "Starting Native VpnService Engine for: ${config.selectedMethod}")
+            // ── Step 2: Establish TUN interface for VPN ──────────────────────
+            // CRITICAL FIX: Only establish TUN if we have a method that
+            // uses a local SOCKS proxy (WS, SSH) that needs traffic routing.
+            // DNS tunneling works on its own socket with no TUN needed yet.
+            val needsTun = !isDns
+
+            if (needsTun) {
+                val tunOk = startVpnInterface()
+                if (!tunOk) {
+                    Logger.log("VPN", "TUN interface could not be created — aborting.")
+                    Logger.setConnectionState(false, "VPN INIT FAILED")
+                    return@Thread
+                }
+            }
+
+            // ── Step 3: Start the selected tunnel protocol engine ─────────────
+            Logger.log("SERVICE", "Starting tunnel engine: ${config.selectedMethod}")
             startForeground(NOTIFICATION_ID, createNotification("Active: ${config.selectedMethod}"))
 
-            // Establish Android TUN Interface (tun0)
-            startVpnInterface()
-
-            // Start protocol client engine
             when {
-                config.selectedMethod.contains("Method 1") || config.selectedMethod.contains("DNS") -> {
+                isDns -> {
                     dnsClient = DnsTunnelClient(config).also { it.start(this) }
                 }
                 config.selectedMethod.contains("Method 2") || config.selectedMethod.contains("WebSocket") -> {
@@ -137,94 +145,68 @@ class TunnelService : VpnService() {
         }.start()
     }
 
-    private fun verifyServerConnection(config: TunnelConfig): Boolean {
+    /**
+     * Verify server is reachable using a plain Java HttpURLConnection — no VPN
+     * protect() needed since the TUN does NOT exist yet at this point.
+     * Uses a generous 20-second timeout to handle Render cold-start delays.
+     */
+    private fun pingServerHttp(serverUrl: String): Boolean {
         return try {
-            val healthUrl = "${config.serverUrl.rstrip('/')}/health"
-            val clientBuilder = OkHttpClient.Builder()
-                .connectTimeout(5, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.SECONDS)
-                .socketFactory(object : SocketFactory() {
-                    private val def = getDefault()
-                    override fun createSocket(): Socket = def.createSocket().also { protect(it) }
-                    override fun createSocket(host: String?, port: Int): Socket = def.createSocket(host, port).also { protect(it) }
-                    override fun createSocket(host: String?, port: Int, localHost: InetAddress?, localPort: Int): Socket = def.createSocket(host, port, localHost, localPort).also { protect(it) }
-                    override fun createSocket(host: InetAddress?, port: Int): Socket = def.createSocket(host, port).also { protect(it) }
-                    override fun createSocket(address: InetAddress?, port: Int, localAddress: InetAddress?, localPort: Int): Socket = def.createSocket(address, port, localAddress, localPort).also { protect(it) }
-                })
-
-            val client = clientBuilder.build()
-            val request = Request.Builder().url(healthUrl).build()
-            client.newCall(request).execute().use { response ->
-                response.isSuccessful || response.code == 200 || response.code == 404
-            }
+            val base = serverUrl.trimEnd('/')
+            val healthUrl = "$base/health"
+            Logger.log("VERIFY", "Checking: $healthUrl")
+            val conn = URL(healthUrl).openConnection() as HttpURLConnection
+            conn.connectTimeout = 20_000    // 20 sec — handles Render cold start
+            conn.readTimeout = 20_000
+            conn.requestMethod = "GET"
+            conn.connect()
+            val code = conn.responseCode
+            conn.disconnect()
+            Logger.log("VERIFY", "Server replied HTTP $code")
+            code in 200..499   // Any HTTP response means server is alive
         } catch (e: Exception) {
-            Logger.log("VERIFY", "Verification ping error: ${e.message}")
+            Logger.log("VERIFY", "Ping failed: ${e.message}")
             false
         }
     }
 
-    private fun String.rstrip(c: Char): String = if (endsWith(c)) substring(0, length - 1) else this
-
-    private fun startVpnInterface() {
-        try {
+    /**
+     * Build the Android TUN interface. Returns true if successful.
+     * IMPORTANT: Packets read from TUN are NOT forwarded here yet — the
+     * local SOCKS proxy on port 1080 is the actual data path. The TUN
+     * interface is established so Android VPN key icon appears and the OS
+     * knows to route traffic. Full tun2socks bridging is a future phase.
+     */
+    private fun startVpnInterface(): Boolean {
+        return try {
             val builder = Builder()
                 .setSession("BDNET Tunnel")
                 .addAddress("10.0.0.2", 24)
-                .addRoute("0.0.0.0", 0) // Intercept ALL IPv4 traffic
-                .addDnsServer("1.1.1.1") // Route DNS lookups to VPN interface
+                .addRoute("0.0.0.0", 0)
+                .addDnsServer("1.1.1.1")
                 .addDnsServer("8.8.8.8")
                 .setMtu(1500)
 
             vpnInterface = builder.establish()
             if (vpnInterface != null) {
                 isVpnRunning = true
-                Logger.log("VPN", "Native TUN interface established! (10.0.0.2/24 -> 0.0.0.0/0)")
-                startTunPacketLoop()
+                Logger.log("VPN", "TUN interface established (10.0.0.2/24). VPN active.")
+                true
             } else {
-                Logger.log("VPN", "Failed to establish VPN interface (Permission missing?).")
+                Logger.log("VPN", "TUN establish returned null — permission may have been revoked.")
+                false
             }
         } catch (e: Exception) {
-            Logger.log("VPN", "Error establishing TUN interface: ${e.message}")
+            Logger.log("VPN", "TUN error: ${e.message}")
+            false
         }
-    }
-
-    private fun startTunPacketLoop() {
-        tunThread = Thread {
-            val pfd = vpnInterface ?: return@Thread
-            val inStream = FileInputStream(pfd.fileDescriptor)
-            val buffer = ByteArray(32767)
-
-            try {
-                while (isVpnRunning) {
-                    val readLen = inStream.read(buffer)
-                    if (readLen <= 0) continue
-
-                    // Add captured packet traffic to stats
-                    Logger.addTraffic(readLen.toLong(), (readLen * 0.85).toLong())
-
-                    // Parse IP Header (IPv4 = version 4)
-                    val ipVersion = (buffer[0].toInt() shr 4) and 0x0F
-                    if (ipVersion == 4 && readLen >= 20) {
-                        val protocol = buffer[9].toInt() and 0xFF
-                        if (protocol == 17 && readLen >= 28) { // UDP
-                            val destPort = ((buffer[22].toInt() and 0xFF) shl 8) or (buffer[23].toInt() and 0xFF)
-                            if (destPort == 53) { // DNS Query Interception
-                                Logger.log("VPN_DNS", "Intercepted OS DNS Query ($readLen bytes)")
-                            }
-                        }
-                    }
-                }
-            } catch (e: IOException) {
-                if (isVpnRunning) Logger.log("VPN", "TUN loop exception: ${e.message}")
-            }
-        }.apply { start() }
     }
 
     private fun startStatsLoop() {
         statsRunnable = object : Runnable {
             override fun run() {
-                if (isVpnRunning) {
-                    Logger.updateStreams(1)
+                Logger.updateStreams(if (isVpnRunning) 1 else 0)
+                if (Logger.isConnected) {
                     handler.postDelayed(this, 1000)
                 }
             }
@@ -277,7 +259,7 @@ class TunnelService : VpnService() {
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("BDNET Tunnel (VPN Active)")
+            .setContentTitle("BDNET Tunnel")
             .setContentText(contentText)
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setContentIntent(pendingIntent)

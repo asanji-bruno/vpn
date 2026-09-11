@@ -30,9 +30,10 @@ class WsTunnelClient(private val config: TunnelConfig) {
         Logger.log("WS_RELAY", "Starting WebSocket Relay Client...")
         Logger.log("WS_RELAY", "Target Server: ${config.wsUrl}")
 
+        Logger.log("WS_RELAY", "Connecting to: ${config.wsUrl}")
         val builder = OkHttpClient.Builder()
             .readTimeout(0, TimeUnit.MILLISECONDS)
-            .connectTimeout(10, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)  // 30s handles Render cold start
 
         if (vpnService != null) {
             builder.socketFactory(object : SocketFactory() {
@@ -65,8 +66,10 @@ class WsTunnelClient(private val config: TunnelConfig) {
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                Logger.log("WS_RELAY", "WebSocket ERROR: ${t.message}")
-                Logger.setConnectionState(false, "DISCONNECTED (Error: ${t.message})")
+                Logger.log("WS_RELAY", "WebSocket FAILED: ${t.message}")
+                Logger.log("WS_RELAY", "Attempted URL: ${config.wsUrl}")
+                Logger.log("WS_RELAY", "If server is on Render free tier — it may need 30s to wake up. Try again.")
+                Logger.setConnectionState(false, "FAILED: ${t.message}")
                 stop()
             }
 

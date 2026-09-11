@@ -170,12 +170,28 @@ class MainActivity : AppCompatActivity(), Logger.LogListener {
     }
 
     private fun launchTunnelService() {
-        config.serverUrl = etServerUrl.text.toString().trim()
-        val ngrokBase = config.serverUrl.replace("https://", "").replace("http://", "")
-        config.wsUrl = "wss://$ngrokBase/ws"
-        config.vlessUrl = "wss://$ngrokBase/vless"
-        config.sshWsUrl = "wss://$ngrokBase/ssh-relay"
+        var rawUrl = etServerUrl.text.toString().trim()
+        if (rawUrl.isEmpty()) {
+            tvVerifyDetails.text = "Please enter a valid server URL."
+            return
+        }
+        if (!rawUrl.startsWith("http://") && !rawUrl.startsWith("https://")) {
+            rawUrl = "https://$rawUrl"
+        }
+        rawUrl = rawUrl.trimEnd('/')
+        config.serverUrl = rawUrl
+
+        val isSecure = rawUrl.startsWith("https://")
+        val wsScheme = if (isSecure) "wss://" else "ws://"
+        val hostAndPort = rawUrl.removePrefix("https://").removePrefix("http://").trimEnd('/')
+
+        config.wsUrl = "$wsScheme$hostAndPort/ws"
+        config.vlessUrl = "$wsScheme$hostAndPort/vless"
+        config.sshWsUrl = "$wsScheme$hostAndPort/ssh-relay"
         config.selectedMethod = spMethod.selectedItem.toString()
+
+        Logger.log("INIT", "Target Server: ${config.serverUrl}")
+        Logger.log("INIT", "Target WebSocket: ${config.wsUrl}")
 
         val serviceIntent = Intent(this, TunnelService::class.java).apply {
             action = TunnelService.ACTION_START
@@ -186,7 +202,6 @@ class MainActivity : AppCompatActivity(), Logger.LogListener {
             putExtra("sshWsUrl", config.sshWsUrl)
         }
         startService(serviceIntent)
-        tunnelService?.startTunnel(config)
     }
 
     private fun stopTunnelService() {

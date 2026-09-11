@@ -17,21 +17,57 @@ class DnsTunnelClient(private val config: TunnelConfig) {
         isRunning = true
         Logger.log("DNS_TUNNEL", "Starting DNS Tunnel (Method 1)...")
         Logger.log("DNS_TUNNEL", "DNS Server: ${config.dnsServer}, Domain: ${config.dnsDomain}")
+        // DO NOT set connected state here — only set connected after a real round-trip succeeds
 
         Thread {
             try {
                 val ds = DatagramSocket()
                 vpnService?.protect(ds)
                 socket = ds
-                Logger.setConnectionState(true, "CONNECTED (DNS Tunnel)")
-                
-                // Send keepalive query
-                sendDnsData("PING")
+                Logger.log("DNS_TUNNEL", "UDP socket open — testing real DNS tunnel round-trip...")
+
+                // Send a real PING query and wait for a DNS response
+                // Only declare CONNECTED if we actually receive a reply
+                val success = sendPingAndVerify()
+                if (success) {
+                    Logger.log("DNS_TUNNEL", "DNS tunnel PING round-trip SUCCESS — tunnel is active!")
+                    Logger.setConnectionState(true, "CONNECTED (DNS Tunnel)")
+                } else {
+                    Logger.log("DNS_TUNNEL", "DNS PING got no response — server DNS domain may not be configured.")
+                    Logger.log("DNS_TUNNEL", "DNS Domain: '${config.dnsDomain}' must point NS records to your VPS IP.")
+                    Logger.setConnectionState(false, "DNS TUNNEL: NO RESPONSE (domain not configured?)")
+                }
             } catch (e: Exception) {
                 Logger.log("DNS_TUNNEL", "DNS Error: ${e.message}")
-                Logger.setConnectionState(false, "DISCONNECTED")
+                Logger.setConnectionState(false, "DNS TUNNEL FAILED: ${e.message}")
             }
         }.start()
+    }
+
+    private fun sendPingAndVerify(): Boolean {
+        return try {
+            val b32 = encodeBase32("PING".toByteArray())
+            val domainQuery = "s${seqNumber.getAndIncrement()}-$b32.${config.dnsDomain}"
+            Logger.log("DNS_TUNNEL", "Sending verification query: $domainQuery")
+
+            val dnsQueryBytes = buildDnsQuery(domainQuery)
+            val serverAddr = InetAddress.getByName(config.dnsServer)
+            val sendPacket = DatagramPacket(dnsQueryBytes, dnsQueryBytes.size, serverAddr, 53)
+            socket?.send(sendPacket)
+
+            // Wait up to 5 seconds for any DNS response
+            val recvBuf = ByteArray(512)
+            val recvPacket = DatagramPacket(recvBuf, recvBuf.size)
+            socket?.soTimeout = 5000
+            socket?.receive(recvPacket)
+
+            // If we got any response back, the tunnel is working
+            Logger.log("DNS_TUNNEL", "Got DNS response (${recvPacket.length} bytes) from ${recvPacket.address}")
+            true
+        } catch (e: Exception) {
+            Logger.log("DNS_TUNNEL", "No DNS response received: ${e.message}")
+            false
+        }
     }
 
     private fun sendDnsData(dataStr: String) {
