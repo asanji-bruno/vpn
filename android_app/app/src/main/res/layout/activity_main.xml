@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/bg_dark"
-    android:padding="16dp">
+    android:background="@color/bg_dark">
 
-    <!-- Header Title -->
+    <!-- Top Header Bar -->
     <LinearLayout
+        android:id="@+id/headerBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="16dp">
+        android:padding="16dp"
+        android:background="@color/card_bg">
 
         <TextView
             android:layout_width="0dp"
@@ -21,7 +22,7 @@
             android:layout_weight="1"
             android:text="BDNET TUNNEL PRO"
             android:textColor="@color/accent_cyan"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
@@ -31,136 +32,404 @@
             android:text="DISCONNECTED"
             android:textColor="@color/accent_red"
             android:textStyle="bold"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:background="#33EF4444"
             android:paddingHorizontal="10dp"
             android:paddingVertical="4dp" />
     </LinearLayout>
 
-    <!-- Config Card -->
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/card_bg"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="0dp"
-        app:strokeColor="@color/card_border"
-        app:strokeWidth="1dp"
-        android:layout_marginBottom="12dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TUNNELING METHOD"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
-            <Spinner
-                android:id="@+id/spMethod"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:spinnerMode="dropdown"
-                android:layout_marginTop="4dp"
-                android:background="#0F172A" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SERVER URL (NGROK / ENDPOINT)"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:layout_marginTop="10dp" />
-
-            <EditText
-                android:id="@+id/etServerUrl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#0F172A"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:padding="10dp"
-                android:layout_marginTop="4dp"
-                android:inputType="textUri"
-                android:text="https://battery-twirl-designate.ngrok-free.dev" />
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Connect Action Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnConnect"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="START TUNNEL"
-        android:textColor="@color/bg_dark"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:backgroundTint="@color/accent_cyan"
-        app:cornerRadius="12dp"
-        android:layout_marginBottom="12dp" />
-
-    <!-- Live Terminal Log Header -->
+    <!-- Bottom Navigation Bar -->
     <LinearLayout
+        android:id="@+id/bottomNavBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="6dp">
+        android:background="@color/card_bg"
+        android:weightSum="3">
 
-        <TextView
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTabHome"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="LIVE CONSOLE TERMINAL"
-            android:textColor="@color/text_secondary"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/btnClearLogs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="CLEAR"
+            android:text="SETTINGS"
             android:textColor="@color/accent_cyan"
-            android:textSize="11sp"
+            android:textSize="12sp"
             android:textStyle="bold"
-            android:padding="4dp" />
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTabStats"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="DATA MONITOR"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTabTerminal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="TERMINAL"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
     </LinearLayout>
 
-    <!-- Terminal Box -->
-    <com.google.android.material.card.MaterialCardView
+    <!-- Main Content Container -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        app:cardBackgroundColor="@color/terminal_bg"
-        app:cardCornerRadius="8dp"
-        app:strokeColor="@color/card_border"
-        app:strokeWidth="1dp">
+        android:layout_height="match_parent"
+        android:layout_below="@id/headerBar"
+        android:layout_above="@id/bottomNavBar"
+        android:padding="16dp">
 
-        <ScrollView
-            android:id="@+id/svTerminal"
+        <!-- ================= PAGE 1: HOME / CONNECTION SETTINGS ================= -->
+        <LinearLayout
+            android:id="@+id/layoutHome"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="10dp"
-            android:fillViewport="true">
+            android:orientation="vertical"
+            android:visibility="visible">
 
-            <TextView
-                android:id="@+id/tvTerminalLog"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/terminal_green"
-                android:fontFamily="monospace"
-                android:textSize="12sp"
-                android:text="[READY] Tap START TUNNEL to initiate connection...\n" />
-        </ScrollView>
-    </com.google.android.material.card.MaterialCardView>
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="12dp"
+                app:strokeColor="@color/card_border"
+                app:strokeWidth="1dp"
+                android:layout_marginBottom="16dp">
 
-</LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SELECT TUNNELING PROTOCOL"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <Spinner
+                        android:id="@+id/spMethod"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:spinnerMode="dropdown"
+                        android:layout_marginTop="6dp"
+                        android:background="#0F172A" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SERVER ENDPOINT (URL / IP)"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="16dp" />
+
+                    <EditText
+                        android:id="@+id/etServerUrl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#0F172A"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:padding="12dp"
+                        android:layout_marginTop="6dp"
+                        android:inputType="textUri"
+                        android:text="https://battery-twirl-designate.ngrok-free.dev" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Big Connect / Disconnect Action Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnConnect"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:text="START TUNNEL"
+                android:textColor="@color/bg_dark"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/accent_cyan"
+                app:cornerRadius="12dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Server Connection Verification Info -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="12dp"
+                app:strokeColor="@color/card_border"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CONNECTION STATUS &amp; VERIFICATION"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvVerifyDetails"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Idle — Tap START TUNNEL to verify server handshake and establish VPN."
+                        android:textColor="@color/text_primary"
+                        android:textSize="13sp"
+                        android:layout_marginTop="8dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- ================= PAGE 2: DATA MONITORING DASHBOARD ================= -->
+        <LinearLayout
+            android:id="@+id/layoutStats"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LIVE DATA TRAFFIC MONITOR"
+                android:textColor="@color/accent_cyan"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Grid for Upload / Download Stats -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp"
+                android:weightSum="2">
+
+                <!-- Download Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    app:cardBackgroundColor="@color/card_bg"
+                    app:cardCornerRadius="12dp"
+                    app:strokeColor="@color/card_border"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="DOWNLOAD (RX)"
+                            android:textColor="@color/accent_green"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvDownloadSpeed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0.0 KB/s"
+                            android:textColor="@color/text_primary"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="4dp" />
+
+                        <TextView
+                            android:id="@+id/tvTotalDownload"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total: 0 KB"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Upload Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardBackgroundColor="@color/card_bg"
+                    app:cardCornerRadius="12dp"
+                    app:strokeColor="@color/card_border"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="UPLOAD (TX)"
+                            android:textColor="@color/accent_cyan"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvUploadSpeed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0.0 KB/s"
+                            android:textColor="@color/text_primary"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="4dp" />
+
+                        <TextView
+                            android:id="@+id/tvTotalUpload"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total: 0 KB"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- Additional Metrics Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="12dp"
+                app:strokeColor="@color/card_border"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvActiveStreams"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Active Stream Connections: 0"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvSessionDuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tunnel Duration: 00:00:00"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:layout_marginTop="6dp" />
+
+                    <TextView
+                        android:id="@+id/tvActiveProtocol"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Active Protocol: None"
+                        android:textColor="@color/accent_cyan"
+                        android:textSize="13sp"
+                        android:layout_marginTop="6dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- ================= PAGE 3: TERMINAL CONSOLE LOG ================= -->
+        <LinearLayout
+            android:id="@+id/layoutTerminal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="LIVE CONSOLE TERMINAL LOG"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnClearLogs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CLEAR LOGS"
+                    android:textColor="@color/accent_cyan"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:padding="6dp" />
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="@color/terminal_bg"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="@color/card_border"
+                app:strokeWidth="1dp">
+
+                <ScrollView
+                    android:id="@+id/svTerminal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="12dp"
+                    android:fillViewport="true">
+
+                    <TextView
+                        android:id="@+id/tvTerminalLog"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/terminal_green"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp"
+                        android:text="[READY] Tap START TUNNEL to initiate connection...\n" />
+                </ScrollView>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</RelativeLayout>

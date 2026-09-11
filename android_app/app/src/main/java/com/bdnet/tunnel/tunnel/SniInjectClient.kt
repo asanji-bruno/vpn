@@ -1,10 +1,10 @@
 package com.bdnet.tunnel.tunnel
 
+import android.net.VpnService
 import com.bdnet.tunnel.model.TunnelConfig
 import com.bdnet.tunnel.util.Logger
 import java.io.InputStream
 import java.io.OutputStream
-import java.net.InetSocketAddress
 import java.net.ServerSocket
 import java.net.Socket
 import javax.net.ssl.SNIHostName
@@ -15,9 +15,11 @@ import javax.net.ssl.SSLSocketFactory
 class SniInjectClient(private val config: TunnelConfig) {
     private var isRunning = false
     private var serverSocket: ServerSocket? = null
+    private var activeVpnService: VpnService? = null
 
-    fun start() {
+    fun start(vpnService: VpnService? = null) {
         isRunning = true
+        activeVpnService = vpnService
         Logger.log("SNI_INJECT", "Starting SNI Payload Injector...")
         Logger.log("SNI_INJECT", "Bug Host / SNI: ${config.sniHost}")
         Logger.log("SNI_INJECT", "Payload Template: ${config.payload}")
@@ -45,6 +47,8 @@ class SniInjectClient(private val config: TunnelConfig) {
             // Perform TLS handshake with custom SNI bug host
             val factory = SSLSocketFactory.getDefault() as SSLSocketFactory
             val sslSocket = factory.createSocket(config.sniHost, 443) as SSLSocket
+            activeVpnService?.protect(sslSocket)
+
             val params = SSLParameters()
             params.serverNames = listOf(SNIHostName(config.sniHost))
             sslSocket.sslParameters = params

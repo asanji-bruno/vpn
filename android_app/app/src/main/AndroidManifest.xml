@@ -29,12 +29,17 @@
             </intent-filter>
         </activity>
 
-        <!-- Tunnel Service for background execution -->
+        <!-- Tunnel Service for VpnService background execution -->
         <service
             android:name=".TunnelService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="specialUse" />
+            android:permission="android.permission.BIND_VPN_SERVICE"
+            android:foregroundServiceType="specialUse">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+        </service>
 
     </application>
 

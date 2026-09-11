@@ -1,5 +1,6 @@
 package com.bdnet.tunnel.tunnel
 
+import android.net.VpnService
 import com.bdnet.tunnel.model.TunnelConfig
 import com.bdnet.tunnel.util.Logger
 import java.net.DatagramPacket
@@ -12,14 +13,16 @@ class DnsTunnelClient(private val config: TunnelConfig) {
     private var socket: DatagramSocket? = null
     private val seqNumber = AtomicInteger(1)
 
-    fun start() {
+    fun start(vpnService: VpnService? = null) {
         isRunning = true
         Logger.log("DNS_TUNNEL", "Starting DNS Tunnel (Method 1)...")
         Logger.log("DNS_TUNNEL", "DNS Server: ${config.dnsServer}, Domain: ${config.dnsDomain}")
 
         Thread {
             try {
-                socket = DatagramSocket()
+                val ds = DatagramSocket()
+                vpnService?.protect(ds)
+                socket = ds
                 Logger.setConnectionState(true, "CONNECTED (DNS Tunnel)")
                 
                 // Send keepalive query

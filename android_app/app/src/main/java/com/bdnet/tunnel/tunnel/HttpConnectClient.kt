@@ -1,5 +1,6 @@
 package com.bdnet.tunnel.tunnel
 
+import android.net.VpnService
 import com.bdnet.tunnel.model.TunnelConfig
 import com.bdnet.tunnel.util.Logger
 import java.io.InputStream
@@ -10,9 +11,11 @@ import java.net.Socket
 class HttpConnectClient(private val config: TunnelConfig) {
     private var isRunning = false
     private var serverSocket: ServerSocket? = null
+    private var activeVpnService: VpnService? = null
 
-    fun start() {
+    fun start(vpnService: VpnService? = null) {
         isRunning = true
+        activeVpnService = vpnService
         Logger.log("HTTP_PROXY", "Starting HTTP CONNECT Proxy (Method 6)...")
         Logger.log("HTTP_PROXY", "Target Server URL: ${config.serverUrl}")
 
@@ -36,6 +39,7 @@ class HttpConnectClient(private val config: TunnelConfig) {
         try {
             val serverHost = config.serverUrl.replace("https://", "").replace("http://", "").split("/")[0]
             val upstreamSocket = Socket(serverHost, 80)
+            activeVpnService?.protect(upstreamSocket)
 
             val clientIn = clientSocket.getInputStream()
             val clientOut = clientSocket.getOutputStream()

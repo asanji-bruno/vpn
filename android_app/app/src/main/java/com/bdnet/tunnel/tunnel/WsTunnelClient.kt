@@ -1,36 +1,51 @@
 package com.bdnet.tunnel.tunnel
 
+import android.net.VpnService
 import com.bdnet.tunnel.model.TunnelConfig
 import com.bdnet.tunnel.util.Logger
 import okhttp3.*
 import okio.ByteString
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.InetAddress
 import java.net.ServerSocket
 import java.net.Socket
 import java.nio.ByteBuffer
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import javax.net.SocketFactory
 
 class WsTunnelClient(private val config: TunnelConfig) {
     private var isRunning = false
     private var serverSocket: ServerSocket? = null
     private var webSocket: WebSocket? = null
-    private val okHttpClient = OkHttpClient.Builder()
-        .readTimeout(0, TimeUnit.MILLISECONDS)
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .build()
-
     private val activeStreams = ConcurrentHashMap<Int, StreamPair>()
     private val nextStreamId = AtomicInteger(1)
 
     data class StreamPair(val socket: Socket, val input: InputStream, val output: OutputStream)
 
-    fun start() {
+    fun start(vpnService: VpnService? = null) {
         isRunning = true
         Logger.log("WS_RELAY", "Starting WebSocket Relay Client...")
         Logger.log("WS_RELAY", "Target Server: ${config.wsUrl}")
+
+        val builder = OkHttpClient.Builder()
+            .readTimeout(0, TimeUnit.MILLISECONDS)
+            .connectTimeout(10, TimeUnit.SECONDS)
+
+        if (vpnService != null) {
+            builder.socketFactory(object : SocketFactory() {
+                private val defaultFactory = getDefault()
+                override fun createSocket(): Socket = defaultFactory.createSocket().also { vpnService.protect(it) }
+                override fun createSocket(host: String?, port: Int): Socket = defaultFactory.createSocket(host, port).also { vpnService.protect(it) }
+                override fun createSocket(host: String?, port: Int, localHost: InetAddress?, localPort: Int): Socket = defaultFactory.createSocket(host, port, localHost, localPort).also { vpnService.protect(it) }
+                override fun createSocket(host: InetAddress?, port: Int): Socket = defaultFactory.createSocket(host, port).also { vpnService.protect(it) }
+                override fun createSocket(address: InetAddress?, port: Int, localAddress: InetAddress?, localPort: Int): Socket = defaultFactory.createSocket(address, port, localAddress, localPort).also { vpnService.protect(it) }
+            })
+        }
+
+        val okHttpClient = builder.build()
 
         val request = Request.Builder()
             .url(config.wsUrl)
