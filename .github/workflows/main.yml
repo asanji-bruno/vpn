@@ -24,6 +24,7 @@ jobs:
 
       - name: Build Android Debug APK
         run: |
+          if [ -d "android_app" ]; then cd android_app; fi
           gradle assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK Artifact
